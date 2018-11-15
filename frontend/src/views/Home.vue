@@ -43,6 +43,8 @@
 
 <script>
 // @ is an alias to /src
+import { checkEmail, checkName } from '../api/api';
+
 export default {
     name: 'home',
     components: {},
@@ -58,9 +60,18 @@ export default {
                 const regex = /^.+@.+\..+$/;
                 if (!regex.test(value)) {
                     cb(new Error('Please enter correct email address'));
-                } else {
-                    cb();
                 }
+                checkEmail(value)
+                    .then((res) => {
+                        if (res.data.valid) {
+                            cb();
+                        } else {
+                            cb(new Error('Existing email address'));
+                        }
+                    })
+                    .catch(() => {
+                        cb(new Error('Server error'));
+                    });
             },
             checkConfirm: (rule, value, cb) => {
                 if (value === this.formAccount.password) {
@@ -123,6 +134,11 @@ export default {
                         message: 'Name is required',
                         trigger: 'blur',
                     },
+                    {
+                        min: 4,
+                        max: 16,
+                        message: 'Name should be 4-16 characters',
+                    },
                 ],
             };
         },
@@ -141,14 +157,13 @@ export default {
     .container {
         display: flex;
         box-sizing: border-box;
-        padding: 30vh 20%;
+        padding: 20vh 20%;
     }
 
     .header {
         min-width: 400px;
         box-sizing: border-box;
         width: 50%;
-
     }
     .header__title {
         font-size: 2.5 * $main-title;
