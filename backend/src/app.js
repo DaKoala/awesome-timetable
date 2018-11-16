@@ -6,9 +6,11 @@ const express = require('express');
 const User = mongoose.model('User');
 const app = express();
 const apiPath = {
-    checkEmail: '/user/checkemail',
-    checkName: '/user/checkname',
+    checkExist: '/user/checkExist',
+    register: '/user/register',
 };
+
+app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
     res.set('Access-Control-Allow-Origin', '*');
@@ -17,12 +19,17 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.resolve(__dirname, 'dist')));
 
-app.get(apiPath.checkEmail, async (req, res) => {
-    const { email } = req.query;
+app.get(apiPath.checkExist, async (req, res) => {
+    const { email, name } = req.query;
     try {
-        const result = await User.findOne({ email });
+        let result;
+        if (email) {
+            result = await User.findOne({ email });
+        } else {
+            result = await User.findOne({ name });
+        }
         res.json({
-            valid: !!result,
+            valid: !result,
         });
     } catch (e) {
         console.log(e);
@@ -31,19 +38,23 @@ app.get(apiPath.checkEmail, async (req, res) => {
     }
 });
 
-app.get(apiPath.checkName, async (req, res) => {
-    const { name } = req.query;
+app.post(apiPath.register, async (req, res) => {
+    const user = req.body;
     try {
-        const result = await User.findOne({ name });
-        if (result) {
+        const email = await User.findOne({ email: user.email });
+        const name = await User.findOne({ name: user.name });
+        if (email || name) {
+            res.status(404);
             res.json({
-                valid: !result,
+                message: 'Existing user',
             });
         }
     } catch (e) {
         console.log(e);
         res.status(404);
-        res.send(e);
+        res.json({
+            message: 'Database error',
+        });
     }
 });
 

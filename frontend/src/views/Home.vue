@@ -16,25 +16,29 @@
                     <el-input v-model="formAccount.password" type="password"></el-input>
                 </el-form-item>
                 <!-- register form -->
-                <el-form-item label="Email" prop="email" v-if="!isLogin">
+                <el-form-item label="Email" prop="email" v-show="!isLogin">
                     <el-input v-model="formAccount.email" placeholder="Your email address">
                     </el-input>
                 </el-form-item>
-                <el-form-item label="Password" prop="password" v-if="!isLogin">
+                <el-form-item label="Password" prop="password" v-show="!isLogin">
                     <el-input v-model="formAccount.password" type="password"
                               placeholder="8-16 characters"></el-input>
                 </el-form-item>
-                <el-form-item label="Confirm" prop="confirm" v-if="!isLogin">
+                <el-form-item label="Confirm" prop="confirm" v-show="!isLogin">
                     <el-input v-model="formAccount.confirm" type="password"
                               placeholder="Confirm your password"></el-input>
                 </el-form-item>
-                <el-form-item label="Name" prop="name" v-if="!isLogin">
+                <el-form-item label="Name" prop="name" v-show="!isLogin">
                     <el-input v-model="formAccount.name"
                               placeholder="4-16 characters, visible to other users"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">{{btnPrimary}}</el-button>
-                    <el-button @click="changeForm('formAccount')">{{btnSub}}</el-button>
+                    <el-button type="primary" @click="submitForm('formAccount')">
+                        {{btnPrimary}}
+                    </el-button>
+                    <el-button @click="changeForm('formAccount')">
+                        {{btnSub}}
+                    </el-button>
                 </el-form-item>
             </el-form>
         </main>
@@ -43,7 +47,7 @@
 
 <script>
 // @ is an alias to /src
-import { checkEmail, checkName } from '../api/api';
+import { checkExist, register } from '../api/api';
 
 export default {
     name: 'home',
@@ -54,19 +58,33 @@ export default {
             formAccount: {
                 email: '',
                 password: '',
+                confirm: '',
                 name: '',
             },
-            checkEmail: (rule, value, cb) => {
+            validateEmail: (rule, value, cb) => {
                 const regex = /^.+@.+\..+$/;
                 if (!regex.test(value)) {
                     cb(new Error('Please enter correct email address'));
                 }
-                checkEmail(value)
+                checkExist('email', value)
                     .then((res) => {
                         if (res.data.valid) {
                             cb();
                         } else {
                             cb(new Error('Existing email address'));
+                        }
+                    })
+                    .catch(() => {
+                        cb(new Error('Server error'));
+                    });
+            },
+            validateName: (rule, value, cb) => {
+                checkExist('name', value)
+                    .then((res) => {
+                        if (res.data.valid) {
+                            cb();
+                        } else {
+                            cb(new Error('Existing name'));
                         }
                     })
                     .catch(() => {
@@ -101,7 +119,7 @@ export default {
                         trigger: 'blur',
                     },
                     {
-                        validator: this.checkEmail,
+                        validator: this.validateEmail,
                         trigger: 'blur',
                     },
                 ],
@@ -115,9 +133,6 @@ export default {
                         min: 8,
                         max: 16,
                         message: 'Password should be 8-16 characters',
-                    },
-                    {
-                        validator: this.checkConfirm,
                         trigger: 'blur',
                     },
                 ],
@@ -125,6 +140,10 @@ export default {
                     {
                         required: true,
                         message: 'You should confirm your password',
+                        trigger: 'blur',
+                    },
+                    {
+                        validator: this.checkConfirm,
                         trigger: 'blur',
                     },
                 ],
@@ -138,12 +157,36 @@ export default {
                         min: 4,
                         max: 16,
                         message: 'Name should be 4-16 characters',
+                        trigger: 'blur',
+                    },
+                    {
+                        validator: this.validateName,
+                        trigger: 'blur',
                     },
                 ],
             };
         },
     },
     methods: {
+        submitForm(formName) {
+            if (!this.isLogin) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        register({
+                            email: this.formAccount.email,
+                            password: this.formAccount.password,
+                            name: this.formAccount.name,
+                        })
+                            .then(() => {
+                                console.log('success');
+                            })
+                            .catch(() => {
+                                console.log('fail');
+                            });
+                    }
+                });
+            }
+        },
         changeForm(formName) {
             this.$refs[formName].clearValidate();
             this.isLogin = !this.isLogin;

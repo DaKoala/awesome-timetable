@@ -1,7 +1,7 @@
 const BASE_URL = 'http://localhost:3000';
 const apiPath = {
-    checkEmail: '/user/checkemail',
-    checkName: '/user/checkname',
+    checkExist: '/user/checkExist',
+    register: '/user/register',
 };
 
 export {

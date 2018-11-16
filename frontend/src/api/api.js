@@ -1,23 +1,31 @@
 import axios from 'axios';
+import jsonToForm from '../util/transformData';
 import { BASE_URL, apiPath } from './config';
 
-const checkEmail = function(email) {
-    return axios.get(`${BASE_URL}${apiPath.checkEmail}`, {
-        params: {
-            email,
-        },
+const checkExist = function(type, value) {
+    const data = {};
+    if (type === 'email') {
+        data.email = value;
+    } else {
+        data.name = value;
+    }
+    return axios.get(`${BASE_URL}${apiPath.checkExist}`, {
+        params: data,
     });
 };
 
-const checkName = function(name) {
-    return axios.get(`${BASE_URL}${apiPath.checkName}`, {
-        params: {
-            name,
+const register = function(userData) {
+    return axios({
+        method: 'post',
+        url: `${BASE_URL}${apiPath.register}`,
+        data: jsonToForm(userData),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
     });
 };
 
 export {
-    checkEmail,
-    checkName,
+    checkExist,
+    register,
 };
