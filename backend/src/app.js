@@ -2,9 +2,17 @@ require('./db');
 const mongoose = require('mongoose');
 const path = require('path');
 const express = require('express');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
+const auth = require('./util/auth');
 
 const User = mongoose.model('User');
 const app = express();
+app.use(session({
+    secret: 'add session secret here!',
+    resave: false,
+    saveUninitialized: true,
+}));
 const apiPath = {
     checkExist: '/user/checkExist',
     register: '/user/register',
@@ -49,6 +57,22 @@ app.post(apiPath.register, async (req, res) => {
                 message: 'Existing user',
             });
         }
+        const hash = await bcrypt.hash(user.password, 6);
+        const newUser = new User({
+            email: user.email,
+            pwdHash: hash,
+            name: user.name,
+            schedules: [],
+        });
+        const newUserSaved = await newUser.save();
+        await auth.startAuthSession(req, newUserSaved);
+        res.json({
+            message: 'success',
+            user: {
+                email: newUserSaved.email,
+                name: newUserSaved.name,
+            },
+        });
     } catch (e) {
         console.log(e);
         res.status(404);

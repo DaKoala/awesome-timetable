@@ -177,10 +177,14 @@ export default {
                             password: this.formAccount.password,
                             name: this.formAccount.name,
                         })
-                            .then(() => {
-                                console.log('success');
+                            .then((res) => {
+                                if (res.status === 200) {
+                                    this.$store.commit('updateUser', res.data.user);
+                                    this.$router.replace('dashboard');
+                                }
                             })
-                            .catch(() => {
+                            .catch((e) => {
+                                console.log(e);
                                 console.log('fail');
                             });
                     }
