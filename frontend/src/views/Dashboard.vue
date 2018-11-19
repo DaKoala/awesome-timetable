@@ -5,8 +5,10 @@
 </template>
 
 <script>
+import validateAuth from '../util/auth';
+
 export default {
-    name: 'Dashboard',
+    name: 'dashboard',
     data() {
         return {
 
@@ -16,6 +18,9 @@ export default {
         user() {
             return this.$store.state.user;
         },
+    },
+    created() {
+        validateAuth(this);
     },
 };
 </script>

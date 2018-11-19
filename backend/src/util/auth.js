@@ -6,7 +6,10 @@ const startAuthSession = function(req, user) {
                     email: user.email,
                     name: user.name,
                 };
-                resolve();
+                resolve({
+                    email: user.email,
+                    name: user.name,
+                });
             } else {
                 console.log(err);
                 reject(new Error('Session generation error'));

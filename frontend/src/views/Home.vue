@@ -47,7 +47,8 @@
 
 <script>
 // @ is an alias to /src
-import { checkExist, register } from '../api/api';
+import { checkExist, register, login } from '../api/api';
+import validateAuth from '../util/auth';
 
 export default {
     name: 'home',
@@ -185,16 +186,29 @@ export default {
                             })
                             .catch((e) => {
                                 console.log(e);
-                                console.log('fail');
                             });
                     }
                 });
+            } else {
+                login({
+                    email: this.formAccount.email,
+                    password: this.formAccount.password,
+                })
+                    .then((res) => {
+                        if (res.status === 200 && res.data.user) {
+                            this.$store.commit('updateUser', res.data.user);
+                            this.$router.replace('/dashboard');
+                        }
+                    });
             }
         },
         changeForm(formName) {
             this.$refs[formName].clearValidate();
             this.isLogin = !this.isLogin;
         },
+    },
+    created() {
+        validateAuth(this);
     },
 };
 </script>

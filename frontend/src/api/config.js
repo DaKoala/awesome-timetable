@@ -3,6 +3,8 @@ const BASE_URL = process.env.NODE_ENV === 'production' ? 'http://linserv1.cims.n
 const apiPath = {
     checkExist: '/user/checkExist',
     register: '/user/register',
+    login: '/user/login',
+    auth: '/user/auth',
 };
 
 export {

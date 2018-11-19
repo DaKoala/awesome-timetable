@@ -11,17 +11,22 @@ const app = express();
 app.use(session({
     secret: 'add session secret here!',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
 }));
+
 const apiPath = {
     checkExist: '/user/checkExist',
     register: '/user/register',
+    login: '/user/login',
+    auth: '/user/auth',
 };
 
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
-    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+    res.set('Access-Control-Allow-Credentials', 'true');
+    console.log(req.session.id);
     next();
 });
 
@@ -43,6 +48,35 @@ app.get(apiPath.checkExist, async (req, res) => {
         console.log(e);
         res.status(404);
         res.send(e);
+    }
+});
+
+app.post(apiPath.login, async (req, res) => {
+    const user = req.body;
+    const savedUser = await User.findOne({ email: user.email });
+    if (!savedUser) {
+        res.status(404);
+        res.send({
+            message: 'User Not Found',
+        });
+    }
+    const match = await bcrypt.compare(user.password, savedUser.pwdHash);
+    if (match) {
+        const authedUser = await auth.startAuthSession(req, {
+            email: savedUser.email,
+            name: savedUser.name,
+        });
+        res.send({
+            user: {
+                email: authedUser.email,
+                name: authedUser.name,
+            },
+        });
+    } else {
+        res.status(404);
+        res.send({
+            message: 'Incorrect email/password',
+        });
     }
 });
 
@@ -80,6 +114,12 @@ app.post(apiPath.register, async (req, res) => {
             message: 'Database error',
         });
     }
+});
+
+app.get(apiPath.auth, (req, res) => {
+    res.json({
+        user: req.session.user,
+    });
 });
 
 app.listen(process.env.PORT || 3000);
