@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 backend/node_modules
+backend/src/dbconfig.json
 frontend/node_modules/
 frontend/dist/
 

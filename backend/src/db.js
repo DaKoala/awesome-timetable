@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const { Schema } = mongoose;
 const { ObjectId } = Schema;
@@ -27,4 +29,14 @@ const UserSchema = new Schema({
 
 mongoose.model('User', UserSchema);
 
-mongoose.connect('mongodb://localhost/awesome');
+let dbconf;
+if (process.env.NODE_ENV === 'production') {
+    const fn = path.join(__dirname, 'dbconfig.json');
+    const data = fs.readFileSync(fn);
+    const conf = JSON.parse(data);
+    dbconf = conf.dbconf;
+} else {
+    dbconf = 'mongodb://localhost/awesome';
+}
+
+mongoose.connect(dbconf);
