@@ -90,5 +90,18 @@ There is no explicit form pages because I want to use modals to deal with forms 
 - (2 points) UI framework
     * [element ui](https://element.eleme.io/#/en-US)
     
-## Code
-**TODO** Link to code files
+# MileStone 2 Progress
+
+## working form
+
+Please create an account to have access to your dashboard. There will be a button to create a new plan. After the plan is created, an AJAX request will be sent to update the page.
+
+![form1](documentation/workingForm1.png)
+
+![form2](documentation/workingForm2.png)
+
+## research topics
+
+- `Vue.js` is applied. All visible elements in the website are built using Vue.js. See [here](https://github.com/nyu-csci-ua-0480-001-003-fall-2018/DaKoala-final-project/tree/master/frontend/src/views)
+
+- `Webpack` is applied. The `backend/src/dist` directory is built using Webpack. See [here](https://github.com/nyu-csci-ua-0480-001-003-fall-2018/DaKoala-final-project/tree/master/backend/src/dist)
