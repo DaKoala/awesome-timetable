@@ -42,9 +42,33 @@ const auth = function() {
     return axios.get(`${BASE_URL}${apiPath.auth}`);
 };
 
+const newPlan = function(creator, planName) {
+    return axios({
+        method: 'post',
+        url: `${BASE_URL}${apiPath.newPlan}`,
+        data: jsonToForm({
+            creator,
+            name: planName,
+        }),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+};
+
+const getPlan = function(creator) {
+    return axios.get(`${BASE_URL}${apiPath.getPlan}`, {
+        params: {
+            creator,
+        },
+    });
+};
+
 export {
     checkExist,
     register,
     auth,
     login,
+    newPlan,
+    getPlan,
 };

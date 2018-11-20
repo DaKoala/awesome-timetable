@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const auth = require('./util/auth');
 
 const User = mongoose.model('User');
+const Plan = mongoose.model('Plan');
 const app = express();
 app.use(session({
     secret: 'add session secret here!',
@@ -19,14 +20,16 @@ const apiPath = {
     register: '/user/register',
     login: '/user/login',
     auth: '/user/auth',
+    newPlan: '/plan/new',
+    getPlan: '/plan/get',
 };
 
 app.use(express.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
-    res.set('Access-Control-Allow-Origin', 'http://localhost:8080');
+    const originName = process.env.NODE_ENV === 'production' ? 'http://linserv1.cims.nyu.edu:38499' : 'http://localhost:8080';
+    res.set('Access-Control-Allow-Origin', originName);
     res.set('Access-Control-Allow-Credentials', 'true');
-    console.log(req.session.id);
     next();
 });
 
@@ -120,6 +123,51 @@ app.get(apiPath.auth, (req, res) => {
     res.json({
         user: req.session.user,
     });
+});
+
+app.post(apiPath.newPlan, async (req, res) => {
+    const plan = req.body;
+    if (plan.creator !== req.session.user.name) {
+        res.status(404);
+        res.send({
+            message: 'Unauthorized user',
+        });
+    }
+    const newPlan = new Plan({
+        name: plan.name,
+        creator: plan.creator,
+        createdAt: new Date(),
+        schedules: [],
+    });
+    try {
+        const savedPlan = await newPlan.save();
+        res.send({
+            message: 'ok',
+            plan: {
+                name: savedPlan.name,
+                createdAt: savedPlan.createdAt,
+                scheduleCount: savedPlan.schedules.length,
+            },
+        });
+    } catch (e) {
+        res.status(404);
+        res.send({
+            message: 'Server error',
+        });
+    }
+});
+
+app.get(apiPath.getPlan, async (req, res) => {
+    const creator = req.query.creator;
+    try {
+        const plans = await Plan.find({ creator });
+        res.json(plans);
+    } catch (e) {
+        res.status(404);
+        res.send({
+            message: 'Server error',
+        });
+    }
 });
 
 app.listen(process.env.PORT || 3000);

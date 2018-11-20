@@ -5,6 +5,8 @@ const apiPath = {
     register: '/user/register',
     login: '/user/login',
     auth: '/user/auth',
+    newPlan: '/plan/new',
+    getPlan: '/plan/get',
 };
 
 export {

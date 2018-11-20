@@ -27,7 +27,24 @@ const UserSchema = new Schema({
     schedules: [ObjectId],
 });
 
+const PlanSchema = new Schema({
+    creator: {
+        required: true,
+        type: String,
+    },
+    name: {
+        required: true,
+        type: String,
+    },
+    createdAt: {
+        required: true,
+        type: Date,
+    },
+    schedules: [ObjectId],
+});
+
 mongoose.model('User', UserSchema);
+mongoose.model('Plan', PlanSchema);
 
 let dbconf;
 if (process.env.NODE_ENV === 'production') {
