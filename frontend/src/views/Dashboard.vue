@@ -1,19 +1,6 @@
 <template>
     <div>
-        <el-menu mode="horizontal" :default-active="activateIndex" class="nav">
-            <el-menu-item index="1">My Plan</el-menu-item>
-            <el-menu-item index="2" disabled>My Schedule</el-menu-item>
-            <div class="nav__user">
-                <el-dropdown>
-                <span class="el-dropdown-link">
-                    {{user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>Sign out</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-            </div>
-        </el-menu>
+        <nav-bar></nav-bar>
         <div class="menu">
             <el-button type="primary" icon="el-icon-plus" @click="toggleDialog">
                 Start a plan
@@ -27,6 +14,15 @@
                     :formatter="dateFormatter">
                     </el-table-column>
                     <el-table-column prop="scheduleCount" width="100" label="Schedules">
+                    </el-table-column>
+                    <el-table-column label="Operation" width="200">
+                        <template slot-scope="scope">
+                            <el-button size="mini" type="success"
+                                       @click="goToSchedule(scope.row.name)">
+                                View
+                            </el-button>
+                            <el-button size="mini" type="danger">Delete</el-button>
+                        </template>
                     </el-table-column>
                 </el-table>
             </div>
@@ -47,12 +43,16 @@
 </template>
 
 <script>
+import NavBar from '../components/NavBar.vue';
 import validateAuth from '../util/auth';
 import formatTime from '../util/timeFormat';
 import { newPlan, getPlan } from '../api/api';
 
 export default {
     name: 'Dashboard',
+    components: {
+        NavBar,
+    },
     data() {
         return {
             dialogVisible: false,
@@ -64,9 +64,7 @@ export default {
         };
     },
     computed: {
-        user() {
-            return this.$store.state.user;
-        },
+
     },
     methods: {
         toggleDialog() {
@@ -85,6 +83,14 @@ export default {
                     }
                 });
         },
+        goToSchedule(name) {
+            this.$router.push({
+                path: '/dashboard/schedule',
+                params: {
+                    scheduleName: name,
+                },
+            });
+        },
     },
     async created() {
         await validateAuth(this);
@@ -102,22 +108,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .nav {
-        display: flex;
-        box-sizing: border-box;
-        padding: 0 50px;
-    }
-
-    .nav__user {
-        position: absolute;
-        right: 50px;
-        height: 61px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-    }
-
     .menu {
         width: 100%;
         height: 100px;

@@ -93,6 +93,7 @@ app.post(apiPath.register, async (req, res) => {
             res.json({
                 message: 'Existing user',
             });
+            return;
         }
         const hash = await bcrypt.hash(user.password, 6);
         const newUser = new User({
@@ -129,6 +130,15 @@ app.post(apiPath.newPlan, async (req, res) => {
     if (!auth.accessAuth(req, res)) { return; }
 
     const plan = req.body;
+    const existPlan = await Plan.findOne({ name: plan.name, creator: req.session.user.name });
+    if (existPlan) {
+        res.status(404);
+        res.send({
+            message: 'Existing plan',
+        });
+        return;
+    }
+
     const newPlan = new Plan({
         name: plan.name,
         creator: req.session.user.name,

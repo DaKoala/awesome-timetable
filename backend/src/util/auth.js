@@ -25,7 +25,7 @@ const accessAuth = function(req, res) {
     } else {
         author = req.body.author;
     }
-    if (author !== req.session.user.name) {
+    if (!req.session.user || author !== req.session.user.name) {
         res.status(404);
         res.send({
             message: 'Unauthorized user',
