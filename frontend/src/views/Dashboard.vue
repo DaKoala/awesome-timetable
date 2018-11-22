@@ -96,7 +96,7 @@ export default {
             createdAt: item.createdAt,
             scheduleCount: item.schedules.length,
         }));
-        this.plans.push(...cleanedPlans);
+        this.plans.push(...cleanedPlans.reverse());
     },
 };
 </script>
