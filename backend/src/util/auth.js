@@ -18,6 +18,24 @@ const startAuthSession = function(req, user) {
     });
 };
 
+const accessAuth = function(req, res) {
+    let author;
+    if (req.method === 'GET') {
+        author = req.query.author;
+    } else {
+        author = req.body.author;
+    }
+    if (author !== req.session.user.name) {
+        res.status(404);
+        res.send({
+            message: 'Unauthorized user',
+        });
+        return false;
+    }
+    return true;
+};
+
 module.exports = {
     startAuthSession,
+    accessAuth,
 };

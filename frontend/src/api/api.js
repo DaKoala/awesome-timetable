@@ -4,64 +4,61 @@ import { BASE_URL, apiPath } from './config';
 
 axios.defaults.withCredentials = true;
 
-const checkExist = function(type, value) {
+const postForm = function(app, url, data) {
+    const authObj = {};
+    if (app.$store.state.user) {
+        authObj.author = app.$store.state.user.name;
+    }
+    return axios({
+        url,
+        method: 'post',
+        data: jsonToForm(Object.assign(data || {}, authObj)),
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+    });
+};
+
+const fetchGet = function(app, url, data) {
+    const authObj = {};
+    if (app.$store.state.user) {
+        authObj.author = app.$store.state.user.name;
+    }
+    return axios.get(url, {
+        params: Object.assign(data || {}, authObj),
+    });
+};
+
+const checkExist = function(app, type, value) {
     const data = {};
     if (type === 'email') {
         data.email = value;
     } else {
         data.name = value;
     }
-    return axios.get(`${BASE_URL}${apiPath.checkExist}`, {
-        params: data,
-    });
+    return fetchGet(app, `${BASE_URL}${apiPath.checkExist}`, data);
 };
 
-const register = function(userData) {
-    return axios({
-        method: 'post',
-        url: `${BASE_URL}${apiPath.register}`,
-        data: jsonToForm(userData),
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    });
+const register = function(app, userData) {
+    return postForm(app, `${BASE_URL}${apiPath.register}`, userData);
 };
 
-const login = function(userData) {
-    return axios({
-        method: 'post',
-        url: `${BASE_URL}${apiPath.login}`,
-        data: jsonToForm(userData),
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    });
+const login = function(app, userData) {
+    return postForm(app, `${BASE_URL}${apiPath.login}`, userData);
 };
 
 const auth = function() {
     return axios.get(`${BASE_URL}${apiPath.auth}`);
 };
 
-const newPlan = function(creator, planName) {
-    return axios({
-        method: 'post',
-        url: `${BASE_URL}${apiPath.newPlan}`,
-        data: jsonToForm({
-            creator,
-            name: planName,
-        }),
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
+const newPlan = function(app, planName) {
+    return postForm(app, `${BASE_URL}${apiPath.newPlan}`, {
+        name: planName,
     });
 };
 
-const getPlan = function(creator) {
-    return axios.get(`${BASE_URL}${apiPath.getPlan}`, {
-        params: {
-            creator,
-        },
-    });
+const getPlan = function(app) {
+    return fetchGet(app, `${BASE_URL}${apiPath.getPlan}`);
 };
 
 export {

@@ -78,7 +78,7 @@ export default {
         },
         createPlan() {
             this.dialogVisible = false;
-            newPlan(this.$store.state.user.name, this.newPlan.name)
+            newPlan(this, this.newPlan.name)
                 .then((res) => {
                     if (res.status === 200) {
                         this.plans.unshift(res.data.plan);
@@ -88,7 +88,7 @@ export default {
     },
     async created() {
         await validateAuth(this);
-        const res = await getPlan(this.$store.state.user.name);
+        const res = await getPlan(this);
         const plans = res.data;
         const cleanedPlans = plans.map(item => ({
             name: item.name,

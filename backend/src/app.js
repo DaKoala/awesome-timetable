@@ -126,16 +126,12 @@ app.get(apiPath.auth, (req, res) => {
 });
 
 app.post(apiPath.newPlan, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
     const plan = req.body;
-    if (plan.creator !== req.session.user.name) {
-        res.status(404);
-        res.send({
-            message: 'Unauthorized user',
-        });
-    }
     const newPlan = new Plan({
         name: plan.name,
-        creator: plan.creator,
+        creator: req.session.user.name,
         createdAt: new Date(),
         schedules: [],
     });
@@ -158,9 +154,10 @@ app.post(apiPath.newPlan, async (req, res) => {
 });
 
 app.get(apiPath.getPlan, async (req, res) => {
-    const creator = req.query.creator;
+    if (!auth.accessAuth(req, res)) { return; }
+
     try {
-        const plans = await Plan.find({ creator });
+        const plans = await Plan.find({ creator: req.session.user.name });
         res.json(plans);
     } catch (e) {
         res.status(404);

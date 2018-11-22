@@ -67,7 +67,7 @@ export default {
                 if (!regex.test(value)) {
                     cb(new Error('Please enter correct email address'));
                 }
-                checkExist('email', value)
+                checkExist(this, 'email', value)
                     .then((res) => {
                         if (res.data.valid) {
                             cb();
@@ -80,7 +80,7 @@ export default {
                     });
             },
             validateName: (rule, value, cb) => {
-                checkExist('name', value)
+                checkExist(this, 'name', value)
                     .then((res) => {
                         if (res.data.valid) {
                             cb();
@@ -169,11 +169,11 @@ export default {
         },
     },
     methods: {
-        submitForm(formName) {
+        async submitForm(formName) {
             if (!this.isLogin) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        register({
+                        register(this, {
                             email: this.formAccount.email,
                             password: this.formAccount.password,
                             name: this.formAccount.name,
@@ -190,7 +190,7 @@ export default {
                     }
                 });
             } else {
-                login({
+                login(this, {
                     email: this.formAccount.email,
                     password: this.formAccount.password,
                 })
