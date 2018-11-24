@@ -1,6 +1,6 @@
 <template>
     <el-menu mode="horizontal" :default-active="activeIndex" class="nav">
-        <el-menu-item index="plan">My Plan</el-menu-item>
+        <el-menu-item index="plan" @click="navPlan">My Plan</el-menu-item>
         <el-menu-item index="schedule" :disabled="disableSchedule">My Schedule</el-menu-item>
         <div class="nav__user">
             <el-dropdown>
@@ -32,7 +32,12 @@ export default {
             return undefined;
         },
         disableSchedule() {
-            return !this.$route.path.indexOf('schedule') > -1;
+            return !(this.$route.path.indexOf('schedule') > -1);
+        },
+    },
+    methods: {
+        navPlan() {
+            this.$router.push('/dashboard');
         },
     },
 };

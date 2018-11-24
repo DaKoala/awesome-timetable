@@ -85,10 +85,7 @@ export default {
         },
         goToSchedule(name) {
             this.$router.push({
-                path: '/dashboard/schedule',
-                params: {
-                    scheduleName: name,
-                },
+                path: `/schedule/${name}`,
             });
         },
     },
