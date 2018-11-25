@@ -35,7 +35,20 @@ const accessAuth = function(req, res) {
     return true;
 };
 
+const getUserFromSession = function(req) {
+    return req.session.user || null;
+};
+
+const getUsernameFromSession = function(req) {
+    if (req.session.user) {
+        return req.session.user.name;
+    }
+    return null;
+};
+
 module.exports = {
     startAuthSession,
     accessAuth,
+    getUserFromSession,
+    getUsernameFromSession,
 };

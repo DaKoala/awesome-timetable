@@ -57,8 +57,14 @@ const newPlan = function(app, planName) {
     });
 };
 
-const getPlan = function(app) {
-    return fetchGet(app, `${BASE_URL}${apiPath.getPlan}`);
+const getAllPlan = function(app) {
+    return fetchGet(app, `${BASE_URL}${apiPath.getAllPlan}`);
+};
+
+const getPlan = function(app, planName) {
+    return fetchGet(app, `${BASE_URL}${apiPath.getPlan}`, {
+        planName,
+    });
 };
 
 export {
@@ -67,5 +73,6 @@ export {
     auth,
     login,
     newPlan,
+    getAllPlan,
     getPlan,
 };

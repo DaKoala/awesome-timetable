@@ -46,7 +46,7 @@
 import NavBar from '../components/NavBar.vue';
 import validateAuth from '../util/auth';
 import formatTime from '../util/timeFormat';
-import { newPlan, getPlan } from '../api/api';
+import { newPlan, getAllPlan } from '../api/api';
 
 export default {
     name: 'Dashboard',
@@ -91,7 +91,7 @@ export default {
     },
     async created() {
         await validateAuth(this);
-        const res = await getPlan(this);
+        const res = await getAllPlan(this);
         const plans = res.data;
         const cleanedPlans = plans.map(item => ({
             name: item.name,

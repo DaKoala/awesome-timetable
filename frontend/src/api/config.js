@@ -6,6 +6,7 @@ const apiPath = {
     login: '/user/login',
     auth: '/user/auth',
     newPlan: '/plan/new',
+    getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
 };
 

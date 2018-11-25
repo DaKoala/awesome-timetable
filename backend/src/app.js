@@ -5,6 +5,7 @@ const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const auth = require('./util/auth');
+const error = require('./util/error');
 
 const User = mongoose.model('User');
 const Plan = mongoose.model('Plan');
@@ -21,6 +22,7 @@ const apiPath = {
     login: '/user/login',
     auth: '/user/auth',
     newPlan: '/plan/new',
+    getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
 };
 
@@ -49,37 +51,36 @@ app.get(apiPath.checkExist, async (req, res) => {
         });
     } catch (e) {
         console.log(e);
-        res.status(404);
-        res.send(e);
+        error.serverError(res);
     }
 });
 
 app.post(apiPath.login, async (req, res) => {
     const user = req.body;
-    const savedUser = await User.findOne({ email: user.email });
-    if (!savedUser) {
-        res.status(404);
-        res.send({
-            message: 'User Not Found',
-        });
-    }
-    const match = await bcrypt.compare(user.password, savedUser.pwdHash);
-    if (match) {
-        const authedUser = await auth.startAuthSession(req, {
-            email: savedUser.email,
-            name: savedUser.name,
-        });
-        res.send({
-            user: {
-                email: authedUser.email,
-                name: authedUser.name,
-            },
-        });
-    } else {
-        res.status(404);
-        res.send({
-            message: 'Incorrect email/password',
-        });
+    try {
+        const savedUser = await User.findOne({ email: user.email });
+        if (!savedUser) {
+            error.customError(res, 'User not found');
+            return;
+        }
+        const match = await bcrypt.compare(user.password, savedUser.pwdHash);
+        if (match) {
+            const authedUser = await auth.startAuthSession(req, {
+                email: savedUser.email,
+                name: savedUser.name,
+            });
+            res.send({
+                user: {
+                    email: authedUser.email,
+                    name: authedUser.name,
+                },
+            });
+        } else {
+            error.customError(res, 'Incorrect email/password');
+        }
+    } catch (e) {
+        console.log(e);
+        error.serverError(res);
     }
 });
 
@@ -89,10 +90,7 @@ app.post(apiPath.register, async (req, res) => {
         const email = await User.findOne({ email: user.email });
         const name = await User.findOne({ name: user.name });
         if (email || name) {
-            res.status(404);
-            res.json({
-                message: 'Existing user',
-            });
+            error.customError(res, 'Existing user');
             return;
         }
         const hash = await bcrypt.hash(user.password, 6);
@@ -113,10 +111,7 @@ app.post(apiPath.register, async (req, res) => {
         });
     } catch (e) {
         console.log(e);
-        res.status(404);
-        res.json({
-            message: 'Database error',
-        });
+        error.serverError(res);
     }
 });
 
@@ -130,18 +125,15 @@ app.post(apiPath.newPlan, async (req, res) => {
     if (!auth.accessAuth(req, res)) { return; }
 
     const plan = req.body;
-    const existPlan = await Plan.findOne({ name: plan.name, creator: req.session.user.name });
+    const existPlan = await Plan.findOne({ name: plan.name, creator: auth.getUsernameFromSession(req) });
     if (existPlan) {
-        res.status(404);
-        res.send({
-            message: 'Existing plan',
-        });
+        error.customError(res, 'Existing plan');
         return;
     }
 
     const newPlan = new Plan({
         name: plan.name,
-        creator: req.session.user.name,
+        creator: auth.getUsernameFromSession(req),
         createdAt: new Date(),
         schedules: [],
     });
@@ -156,10 +148,18 @@ app.post(apiPath.newPlan, async (req, res) => {
             },
         });
     } catch (e) {
-        res.status(404);
-        res.send({
-            message: 'Server error',
-        });
+        error.serverError(res);
+    }
+});
+
+app.get(apiPath.getAllPlan, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    try {
+        const plans = await Plan.find({ creator: auth.getUsernameFromSession(req) });
+        res.json(plans);
+    } catch (e) {
+        error.serverError(res);
     }
 });
 
@@ -167,13 +167,19 @@ app.get(apiPath.getPlan, async (req, res) => {
     if (!auth.accessAuth(req, res)) { return; }
 
     try {
-        const plans = await Plan.find({ creator: req.session.user.name });
-        res.json(plans);
-    } catch (e) {
-        res.status(404);
+        const user = auth.getUsernameFromSession(req);
+        const planName = req.query.planName;
+        const plan = await Plan.findOne({ creator: user, name: planName });
         res.send({
-            message: 'Server error',
+            message: 'ok',
+            plan: {
+                name: plan.name,
+                creator: plan.creator,
+            },
         });
+    } catch (e) {
+        console.log(e);
+        error.serverError(res);
     }
 });
 
