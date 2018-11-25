@@ -1,7 +1,7 @@
 <template>
     <el-menu mode="horizontal" :default-active="activeIndex" class="nav">
-        <el-menu-item index="plan" @click="navPlan">My Plan</el-menu-item>
-        <el-menu-item index="schedule" :disabled="disableSchedule">My Schedule</el-menu-item>
+        <el-menu-item index="plan" @click="navPlan">Dashboard</el-menu-item>
+        <el-menu-item index="schedule" :disabled="disableSchedule">Plan</el-menu-item>
         <div class="nav__user">
             <el-dropdown>
                 <span class="el-dropdown-link">

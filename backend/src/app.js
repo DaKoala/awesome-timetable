@@ -125,7 +125,10 @@ app.post(apiPath.newPlan, async (req, res) => {
     if (!auth.accessAuth(req, res)) { return; }
 
     const plan = req.body;
-    const existPlan = await Plan.findOne({ name: plan.name, creator: auth.getUsernameFromSession(req) });
+    const existPlan = await Plan.findOne({
+        name: plan.name,
+        creator: auth.getUsernameFromSession(req),
+    });
     if (existPlan) {
         error.customError(res, 'Existing plan');
         return;
@@ -135,7 +138,7 @@ app.post(apiPath.newPlan, async (req, res) => {
         name: plan.name,
         creator: auth.getUsernameFromSession(req),
         createdAt: new Date(),
-        schedules: [],
+        events: [],
     });
     try {
         const savedPlan = await newPlan.save();
@@ -144,7 +147,7 @@ app.post(apiPath.newPlan, async (req, res) => {
             plan: {
                 name: savedPlan.name,
                 createdAt: savedPlan.createdAt,
-                scheduleCount: savedPlan.schedules.length,
+                eventsCount: savedPlan.events.length,
             },
         });
     } catch (e) {
@@ -157,7 +160,13 @@ app.get(apiPath.getAllPlan, async (req, res) => {
 
     try {
         const plans = await Plan.find({ creator: auth.getUsernameFromSession(req) });
-        res.json(plans);
+        const cleanPlans = plans.map(item => ({
+            name: item.name,
+            creator: item.creator,
+            createdAt: item.createdAt,
+            eventsCount: item.events.length,
+        }));
+        res.json(cleanPlans);
     } catch (e) {
         error.serverError(res);
     }

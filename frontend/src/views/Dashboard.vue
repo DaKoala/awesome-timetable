@@ -13,7 +13,7 @@
                     <el-table-column prop="createdAt" width="250" label="Created at (YYYY-MM-DD)"
                     :formatter="dateFormatter">
                     </el-table-column>
-                    <el-table-column prop="scheduleCount" width="100" label="Schedules">
+                    <el-table-column prop="eventsCount" width="100" label="Events">
                     </el-table-column>
                     <el-table-column label="Operation" width="200">
                         <template slot-scope="scope">
@@ -97,7 +97,7 @@ export default {
             name: item.name,
             creator: item.creator,
             createdAt: item.createdAt,
-            scheduleCount: item.schedules.length,
+            eventsCount: item.eventsCount,
         }));
         this.plans.push(...cleanedPlans.reverse());
     },

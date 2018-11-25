@@ -1,9 +1,10 @@
 <template>
     <div>
         <nav-bar></nav-bar>
-        <div>
-            {{name}} by {{creator}}
-        </div>
+        <el-container>
+            <el-aside width="200px"></el-aside>
+            <el-main></el-main>
+        </el-container>
     </div>
 </template>
 
@@ -21,10 +22,14 @@ export default {
         };
     },
     async created() {
-        const res = await getPlan(this, this.$route.params.scheduleName);
-        const { plan } = res.data;
-        this.name = plan.name;
-        this.creator = plan.creator;
+        try {
+            const res = await getPlan(this, this.$route.params.scheduleName);
+            const { plan } = res.data;
+            this.name = plan.name;
+            this.creator = plan.creator;
+        } catch (e) {
+            this.$router.push('/dashboard');
+        }
     },
 };
 </script>

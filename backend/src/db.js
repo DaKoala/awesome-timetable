@@ -40,7 +40,7 @@ const PlanSchema = new Schema({
         required: true,
         type: Date,
     },
-    schedules: [ObjectId],
+    events: [ObjectId],
 });
 
 mongoose.model('User', UserSchema);
