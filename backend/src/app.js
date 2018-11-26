@@ -204,7 +204,6 @@ app.post(apiPath.newEvent, async (req, res) => {
     const form = req.body;
     const creator = auth.getUsernameFromSession(req);
     try {
-        console.log(form);
         const existEvent = await Event.findOne({
             creator,
             plan: form.planName,

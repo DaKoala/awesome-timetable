@@ -107,7 +107,7 @@ export default {
             try {
                 this.screenLoading = true;
                 const res = await newEvent(this, this.eventForm);
-                console.log(res);
+                this.events.unshift(res.data);
                 this.screenLoading = false;
                 this.$message({
                     message: 'Event created',
