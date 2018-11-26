@@ -3,21 +3,7 @@
         <nav-bar></nav-bar>
         <aside class="sidebar" v-loading="eventLoading">
             <el-button type="primary" icon="el-icon-date" @click="toggleForm">New event</el-button>
-            <el-card class="card">
-                <div class="card__header">Applied Internet Tech</div>
-                <div class="card__item">
-                    <i class="el-icon-time"></i>
-                    Mon,Wed,Fri,Sun  18:45 - 20:00
-                </div>
-                <div class="card__item">
-                    <i class="el-icon-location-outline"></i>
-                    Silver Center 433
-                </div>
-                <div class="card__button-wrapper">
-                    <el-button type="primary" size="small">Edit</el-button>
-                    <el-button type="danger" size="small">Delete</el-button>
-                </div>
-            </el-card>
+            <event-card v-for="event in events" :event="event" :key="event.name"></event-card>
         </aside>
 
         <el-dialog title="New event" :visible.sync="eventFormVisible">
@@ -72,11 +58,12 @@
 
 <script>
 import NavBar from '../components/NavBar.vue';
+import EventCard from '../components/EventCard.vue';
 import { getPlan, newEvent } from '../api/api';
 
 export default {
     name: 'Schedule',
-    components: { NavBar },
+    components: { NavBar, EventCard },
     data() {
         return {
             name: '',
@@ -154,26 +141,5 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
-    }
-
-    .card {
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 20px;
-    }
-
-    .card__header {
-        font-size: $title;
-        color: $main-text;
-    }
-
-    .card__item {
-        margin-top: 5px;
-        font-size: $paragraph;
-        color: $sub-text;
-    }
-
-    .card__button-wrapper {
-        margin-top: 8px;
     }
 </style>
