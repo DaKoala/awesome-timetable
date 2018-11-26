@@ -8,6 +8,7 @@ const apiPath = {
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
+    newEvent: '/event/new',
 };
 
 export {

@@ -6,9 +6,11 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const auth = require('./util/auth');
 const error = require('./util/error');
+const clean = require('./util/clean');
 
 const User = mongoose.model('User');
 const Plan = mongoose.model('Plan');
+const Event = mongoose.model('Event');
 const app = express();
 app.use(session({
     secret: 'add session secret here!',
@@ -24,6 +26,7 @@ const apiPath = {
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
+    newEvent: '/event/new',
 };
 
 app.use(express.urlencoded({ extended: false }));
@@ -179,13 +182,49 @@ app.get(apiPath.getPlan, async (req, res) => {
         const user = auth.getUsernameFromSession(req);
         const planName = req.query.planName;
         const plan = await Plan.findOne({ creator: user, name: planName });
+        const events = await Event.find({ creator: user, plan: planName });
+        const cleanEvents = events.map(clean.cleanSavedEvent);
         res.send({
+            events: cleanEvents,
             message: 'ok',
             plan: {
                 name: plan.name,
                 creator: plan.creator,
             },
         });
+    } catch (e) {
+        console.log(e);
+        error.serverError(res);
+    }
+});
+
+app.post(apiPath.newEvent, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    const form = req.body;
+    const creator = auth.getUsernameFromSession(req);
+    try {
+        console.log(form);
+        const existEvent = await Event.findOne({
+            creator,
+            plan: form.planName,
+            name: form.name,
+        });
+        if (existEvent) {
+            error.customError(res, 'Existing event');
+            return;
+        }
+        const cleanEvent = new Event({
+            creator: form.author,
+            plan: form.planName,
+            name: form.name,
+            location: form.location,
+            date: form.date.split(','),
+            fromTime: form.fromTime.split(':').map(item => parseInt(item, 10)),
+            toTime: form.toTime.split(':').map(item => parseInt(item, 10)),
+        });
+        const savedEvent = await cleanEvent.save();
+        res.send(clean.cleanSavedEvent(savedEvent));
     } catch (e) {
         console.log(e);
         error.serverError(res);

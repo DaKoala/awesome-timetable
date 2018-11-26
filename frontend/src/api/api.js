@@ -67,6 +67,10 @@ const getPlan = function(app, planName) {
     });
 };
 
+const newEvent = function(app, event) {
+    return postForm(app, `${BASE_URL}${apiPath.newEvent}`, event);
+};
+
 export {
     checkExist,
     register,
@@ -75,4 +79,5 @@ export {
     newPlan,
     getAllPlan,
     getPlan,
+    newEvent,
 };

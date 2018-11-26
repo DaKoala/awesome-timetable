@@ -43,8 +43,60 @@ const PlanSchema = new Schema({
     events: [ObjectId],
 });
 
+const EventSchema = new Schema({
+    creator: {
+        required: true,
+        type: String,
+    },
+    plan: {
+        required: true,
+        type: String,
+    },
+    name: {
+        required: true,
+        type: String,
+    },
+    location: {
+        type: String,
+    },
+    date: {
+        required: true,
+        type: Array,
+        validate: {
+            validator: (value) => {
+                const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                if (value.length > 7 || value.length < 1) {
+                    return false;
+                }
+                return value.reduce((acc, day) => acc && days.includes(day), true);
+            },
+        },
+    },
+    fromTime: {
+        required: true,
+        type: Array,
+        validate: {
+            validator: (value) => {
+                const [hour, minute] = value;
+                return !(value.length !== 2 || hour < 0 || hour > 23 || minute < 0 || minute > 59);
+            },
+        },
+    },
+    toTime: {
+        required: true,
+        type: Array,
+        validate: {
+            validator: (value) => {
+                const [hour, minute] = value;
+                return !(value.length !== 2 || hour < 0 || hour > 23 || minute < 0 || minute > 59);
+            },
+        },
+    },
+});
+
 mongoose.model('User', UserSchema);
 mongoose.model('Plan', PlanSchema);
+mongoose.model('Event', EventSchema);
 
 let dbconf;
 if (process.env.NODE_ENV === 'production') {
