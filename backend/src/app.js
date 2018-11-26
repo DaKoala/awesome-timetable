@@ -223,6 +223,9 @@ app.post(apiPath.newEvent, async (req, res) => {
             toTime: form.toTime.split(':').map(item => parseInt(item, 10)),
         });
         const savedEvent = await cleanEvent.save();
+        await Plan.updateOne({ creator: savedEvent.creator, name: savedEvent.plan }, {
+            $push: { events: savedEvent._id },
+        });
         res.send(clean.cleanSavedEvent(savedEvent));
     } catch (e) {
         console.log(e);

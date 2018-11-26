@@ -87,7 +87,7 @@ export default {
         try {
             const res = await getPlan(this, this.$route.params.scheduleName);
             const { plan } = res.data;
-            this.events = res.data.events;
+            this.events = res.data.events.reverse();
             this.name = plan.name;
             this.creator = plan.creator;
         } catch (e) {

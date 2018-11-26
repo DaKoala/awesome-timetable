@@ -14,6 +14,7 @@ module.exports = {
         'no-trailing-spaces': 'off',
         'space-before-function-paren': 'off',
         'prefer-destructuring': 'off',
+        'no-underscore-dangle': 'off',
     },
     parserOptions: {
         parser: 'babel-eslint',
