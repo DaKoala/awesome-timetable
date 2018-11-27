@@ -5,6 +5,21 @@
             <el-button type="primary" icon="el-icon-date" @click="toggleForm">New event</el-button>
             <event-card v-for="event in events" :event="event" :key="event.name"></event-card>
         </aside>
+        <main class="calendar">
+            <div class="calendar__empty"></div>
+            <div class="calendar__date-wrapper">
+                <div class="calendar__date" v-for="date in dateOptions" :key="date">{{date}}</div>
+            </div>
+            <div class="calendar__time-wrapper">
+                <div class="calendar__time" v-for="(item, index) in Array(13)" :key="index">
+                    {{appendTime(index)}}
+                </div>
+            </div>
+            <div class="calendar__main">
+                <div class="calendar__cell" v-for="(item, index) in Array(98)"
+                     :key="index"></div>
+            </div>
+        </main>
 
         <el-dialog title="New event" :visible.sync="eventFormVisible">
             <el-form :model="eventForm" label-width="80px">
@@ -95,6 +110,10 @@ export default {
         }
     },
     methods: {
+        appendTime(index) {
+            const hour = index + 8;
+            return (String(hour).length > 1 ? `${hour}:00` : `0${hour}:00`);
+        },
         toggleForm() {
             this.eventFormVisible = !this.eventFormVisible;
             this.eventForm.date = ['Mon'];
@@ -141,5 +160,66 @@ export default {
         display: flex;
         flex-direction: column;
         align-items: center;
+    }
+
+    .calendar {
+        position: fixed;
+        top: 69px;
+        bottom: 0;
+        left: 300px;
+        right: 0;
+        background: #e6e6e6;
+        display: grid;
+        grid-gap: 1px;
+        grid-template-columns: 1fr 7fr;
+        grid-template-rows: 1fr 14fr;
+        grid-template-areas: "empty date"
+                             "time main";
+    }
+    .calendar__empty {
+        background: #fff;
+        grid-area: empty;
+    }
+    .calendar__date-wrapper {
+        background: #e6e6e6;
+        grid-area: date;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: 1fr;
+        grid-gap: 1px;
+    }
+    .calendar__date {
+        background: #fff;
+        color: $main-text;
+        font-size: $main-title;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .calendar__time-wrapper {
+        box-sizing: border-box;
+        padding-right: 10px;
+        background: #fff;
+        grid-area: time;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-evenly;
+    }
+    .calendar__time {
+        font-size: $subtitle;
+        color: $regular-text;
+    }
+    .calendar__main {
+        background: #e6e6e6;
+        grid-area: main;
+        display: grid;
+        grid-gap: 1px;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(14, 1fr);
+    }
+    .calendar__cell {
+        background: #fff;
     }
 </style>
