@@ -1,0 +1,7 @@
+@function one-seventh($n) {
+  @return 100% / 7 * $n;
+}
+
+@function one-fourteenth($n) {
+  @return 100% / 14 * $n;
+}

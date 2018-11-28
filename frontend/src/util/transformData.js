@@ -1,4 +1,4 @@
-const jsonToForm = function(obj) {
+function jsonToForm(obj) {
     const resultArr = [];
     Object.entries(obj).forEach((item) => {
         const [key, value] = item;

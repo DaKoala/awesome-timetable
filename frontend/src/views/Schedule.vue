@@ -11,13 +11,30 @@
                 <div class="calendar__date" v-for="date in dateOptions" :key="date">{{date}}</div>
             </div>
             <div class="calendar__time-wrapper">
+                <div></div>
                 <div class="calendar__time" v-for="(item, index) in Array(13)" :key="index">
                     {{appendTime(index)}}
                 </div>
+                <div></div>
             </div>
             <div class="calendar__main">
                 <div class="calendar__cell" v-for="(item, index) in Array(98)"
                      :key="index"></div>
+                <template v-for="event in events">
+                    <div class="calendar__event" v-for="day in event.date" :key="event.name+day"
+                         :style="positionEvent(day, event.fromTime, event.toTime)">
+                        <p class="event__name">{{event.name}}</p>
+                        <p class="event__support">
+                            <i class="el-icon-time"></i>
+                            {{formatTime(event.fromTime, event.toTime)}}
+                        </p>
+                        <p class="event__support" v-if="event.location">
+                            <i class="el-icon-location-outline">
+                                {{event.location}}
+                            </i>
+                        </p>
+                    </div>
+                </template>
             </div>
         </main>
 
@@ -110,9 +127,29 @@ export default {
         }
     },
     methods: {
+        formatTime(start, end) {
+            const formatTimeHelper = time => (String(time).length > 1 ? String(time) : `0${time}`);
+            const result = [];
+            start.forEach(time => result.push(formatTimeHelper(time)));
+            end.forEach(time => result.push(formatTimeHelper(time)));
+            return `${result[0]}:${result[1]} - ${result[2]}:${result[3]}`;
+        },
         appendTime(index) {
             const hour = index + 8;
             return (String(hour).length > 1 ? `${hour}:00` : `0${hour}:00`);
+        },
+        positionEvent(day, [startHour, startMin], [endHour, endMin]) {
+            const ONE_FOURTEENTH = (100 / 14).toFixed(6);
+            const left = this.dateOptions.indexOf(day) * ONE_FOURTEENTH * 2;
+            const top = (startHour - 7 + startMin / 60) * ONE_FOURTEENTH;
+            const width = ONE_FOURTEENTH * 2;
+            const height = (endHour - startHour + (endMin - startMin) / 60) * ONE_FOURTEENTH;
+            return {
+                left: `${left}%`,
+                top: `${top}%`,
+                width: `${width}%`,
+                height: `${height}%`,
+            };
         },
         toggleForm() {
             this.eventFormVisible = !this.eventFormVisible;
@@ -149,21 +186,28 @@ export default {
     @import "../assets/scss/main.scss";
 
     .sidebar {
-        position: fixed;
+        position: absolute;
         top: 69px;
         bottom: 0;
         left: 0;
         width: 300px;
+        min-height: 600px;
         box-sizing: border-box;
         border-right: 1px solid #e6e6e6;
         padding: 20px 10px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        overflow-x: scroll;
+        & > * {
+            flex-shrink: 0;
+        }
     }
 
     .calendar {
-        position: fixed;
+        min-width: 800px;
+        min-height: 600px;
+        position: absolute;
         top: 69px;
         bottom: 0;
         left: 300px;
@@ -171,7 +215,7 @@ export default {
         background: #e6e6e6;
         display: grid;
         grid-gap: 1px;
-        grid-template-columns: 1fr 7fr;
+        grid-template-columns: 1fr 21fr;
         grid-template-rows: 1fr 14fr;
         grid-template-areas: "empty date"
                              "time main";
@@ -199,19 +243,21 @@ export default {
     }
     .calendar__time-wrapper {
         box-sizing: border-box;
-        padding-right: 10px;
         background: #fff;
         grid-area: time;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        justify-content: space-evenly;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr repeat(13, 2fr) 1fr;
     }
     .calendar__time {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         font-size: $subtitle;
         color: $regular-text;
     }
     .calendar__main {
+        position: relative;
         background: #e6e6e6;
         grid-area: main;
         display: grid;
@@ -221,5 +267,29 @@ export default {
     }
     .calendar__cell {
         background: #fff;
+    }
+    .calendar__event {
+        position: absolute;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+        color: $blue;
+        border: 1px solid $blue;
+        background: #ecf5ff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .event__name {
+        color: $blue;
+        font-size: $subtitle;
+        font-weight: bold;
+        margin: 0;
+    }
+    .event__support {
+        color: $blue;
+        font-size: $support;
+        margin: 0;
     }
 </style>
