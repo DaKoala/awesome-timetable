@@ -49,6 +49,7 @@
 // @ is an alias to /src
 import { checkExist, register, login } from '../api/api';
 import validateAuth from '../util/auth';
+import message from '../util/message';
 
 export default {
     name: 'home',
@@ -185,7 +186,7 @@ export default {
                                 }
                             })
                             .catch((e) => {
-                                console.log(e);
+                                message(this, e.response);
                             });
                     }
                 });
@@ -199,6 +200,9 @@ export default {
                             this.$store.commit('updateUser', res.data.user);
                             this.$router.replace('/dashboard');
                         }
+                    })
+                    .catch((e) => {
+                        message(this, e.response);
                     });
             }
         },
