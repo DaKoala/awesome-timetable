@@ -3,7 +3,8 @@
         <nav-bar></nav-bar>
         <aside class="sidebar" v-loading="eventLoading">
             <el-button type="primary" icon="el-icon-date" @click="toggleForm">New event</el-button>
-            <event-card v-for="event in events" :event="event" :key="event.name"></event-card>
+            <event-card v-for="event in events" :event="event" :key="event.name"
+                        @deletecard="handleDeleteCard" @editcard="handleEditCard"></event-card>
         </aside>
         <main class="calendar">
             <div class="calendar__empty"></div>
@@ -91,7 +92,9 @@
 <script>
 import NavBar from '../components/NavBar.vue';
 import EventCard from '../components/EventCard.vue';
-import { getPlan, newEvent } from '../api/api';
+import { getPlan, newEvent, deleteEvent } from '../api/api';
+import popupMessage from '../util/message';
+import deleteFromObjArr from '../util/arrayHelper';
 
 export default {
     name: 'Schedule',
@@ -127,6 +130,23 @@ export default {
         }
     },
     methods: {
+        async handleDeleteCard(event) {
+            await this.$confirm('The event will be deleted permanently, continue?', 'Warning', {
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel',
+                type: 'warning',
+            });
+            try {
+                const res = await deleteEvent(this, event.name);
+                popupMessage(this, res, 'success');
+                deleteFromObjArr(this.events, { name: event.name });
+            } catch (e) {
+                popupMessage(this, e.response);
+            }
+        },
+        handleEditCard(event) {
+            console.log(event.name);
+        },
         formatTime(start, end) {
             const formatTimeHelper = time => (String(time).length > 1 ? String(time) : `0${time}`);
             const result = [];
@@ -171,10 +191,7 @@ export default {
                 });
                 this.toggleForm();
             } catch (e) {
-                this.$message({
-                    message: 'Network error',
-                    type: 'error',
-                });
+                popupMessage(this, e.response);
                 this.eventLoading = false;
             }
         },

@@ -29,6 +29,7 @@ const apiPath = {
     getPlan: '/plan/get',
     deletePlan: '/plan/delete',
     newEvent: '/event/new',
+    deleteEvent: '/event/delete',
 };
 
 app.use(express.urlencoded({ extended: false }));
@@ -259,6 +260,24 @@ app.get(apiPath.deletePlan, async (req, res) => {
         await Plan.deleteOne({ name: planName, creator: username });
         res.send({
             message: 'Plan has been deleted',
+        });
+    } catch (e) {
+        error.serverError(res);
+    }
+});
+
+app.get(apiPath.deleteEvent, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    const eventFeatures = {
+        creator: auth.getUsernameFromSession(req),
+        plan: req.query.planName,
+        name: req.query.eventName,
+    };
+    try {
+        await Event.deleteOne(eventFeatures);
+        res.send({
+            message: 'Event deleted',
         });
     } catch (e) {
         error.serverError(res);

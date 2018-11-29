@@ -5,13 +5,13 @@
             <i class="el-icon-time"></i>
             {{formatDate(event.date)}}  {{formatTime(event.fromTime, event.toTime)}}
         </div>
-        <div class="card__item">
+        <div class="card__item" v-if="event.location">
             <i class="el-icon-location-outline"></i>
             {{event.location}}
         </div>
         <div class="card__button-wrapper">
-            <el-button type="primary" size="small">Edit</el-button>
-            <el-button type="danger" size="small">Delete</el-button>
+            <el-button type="primary" size="small" @click="editCard(event)">Edit</el-button>
+            <el-button type="danger" size="small" @click="deleteCard(event)">Delete</el-button>
         </div>
     </el-card>
 </template>
@@ -47,6 +47,12 @@ export default {
             start.forEach(time => result.push(formatTimeHelper(time)));
             end.forEach(time => result.push(formatTimeHelper(time)));
             return `${result[0]}:${result[1]} - ${result[2]}:${result[3]}`;
+        },
+        editCard(event) {
+            this.$emit('editcard', event);
+        },
+        deleteCard(event) {
+            this.$emit('deletecard', event);
         },
     },
 };

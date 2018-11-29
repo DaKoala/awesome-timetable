@@ -81,6 +81,13 @@ function deletePlan(app, planName) {
     });
 }
 
+function deleteEvent(app, eventName) {
+    return fetchGet(app, `${BASE_URL}${apiPath.deleteEvent}`, {
+        eventName,
+        planName: app.$route.params.scheduleName,
+    });
+}
+
 export {
     checkExist,
     register,
@@ -92,4 +99,5 @@ export {
     getPlan,
     newEvent,
     deletePlan,
+    deleteEvent,
 };
