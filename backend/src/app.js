@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const auth = require('./util/auth');
 const error = require('./util/error');
 const clean = require('./util/clean');
+const timeFormat = require('./util/timeFormat');
 
 const User = mongoose.model('User');
 const Plan = mongoose.model('Plan');
@@ -30,6 +31,7 @@ const apiPath = {
     deletePlan: '/plan/delete',
     newEvent: '/event/new',
     deleteEvent: '/event/delete',
+    updateEvent: '/event/update',
 };
 
 app.use(express.urlencoded({ extended: false }));
@@ -236,8 +238,8 @@ app.post(apiPath.newEvent, async (req, res) => {
             name: form.name,
             location: form.location,
             date: form.date.split(','),
-            fromTime: form.fromTime.split(':').map(item => parseInt(item, 10)),
-            toTime: form.toTime.split(':').map(item => parseInt(item, 10)),
+            fromTime: timeFormat.stringTimeToArray(form.fromTime),
+            toTime: timeFormat.stringTimeToArray(form.toTime),
         });
         const savedEvent = await cleanEvent.save();
         await Plan.updateOne({ creator: savedEvent.creator, name: savedEvent.plan }, {
@@ -275,10 +277,36 @@ app.get(apiPath.deleteEvent, async (req, res) => {
         name: req.query.eventName,
     };
     try {
+        const eventInDb = await Event.findOne(eventFeatures);
+        await Plan.update({ creator: auth.getUsernameFromSession(req), name: req.query.planName }, {
+            $pull: { events: eventInDb._id },
+        });
         await Event.deleteOne(eventFeatures);
         res.send({
             message: 'Event deleted',
         });
+    } catch (e) {
+        error.serverError(res);
+    }
+});
+
+app.post(apiPath.updateEvent, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    const form = req.body;
+    const creator = auth.getUsernameFromSession(req);
+    const modification = {
+        name: form.newName,
+        location: form.location,
+        fromTime: timeFormat.stringTimeToArray(form.fromTime),
+        toTime: timeFormat.stringTimeToArray(form.toTime),
+        date: form.date.split(','),
+    };
+    try {
+        await Event.update({ creator, plan: form.planName, name: form.oldName }, {
+            $set: modification,
+        });
+        res.send(modification);
     } catch (e) {
         error.serverError(res);
     }

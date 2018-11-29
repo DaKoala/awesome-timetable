@@ -10,4 +10,13 @@ function dateToString(d) {
     return result.join('-');
 }
 
-export default dateToString;
+function arrayTimeToString([hour, minute]) {
+    const hourString = String(hour).length > 1 ? String(hour) : `0${hour}`;
+    const minuteString = String(minute).length > 1 ? String(minute) : `0${minute}`;
+    return `${hourString}:${minuteString}`;
+}
+
+export {
+    dateToString,
+    arrayTimeToString,
+};

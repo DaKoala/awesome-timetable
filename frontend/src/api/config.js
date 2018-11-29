@@ -12,6 +12,7 @@ const apiPath = {
     deletePlan: '/plan/delete',
     newEvent: '/event/new',
     deleteEvent: '/event/delete',
+    updateEvent: '/event/update',
 };
 
 export {

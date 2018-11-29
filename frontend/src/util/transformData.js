@@ -5,6 +5,6 @@ function jsonToForm(obj) {
         resultArr.push(`${key}=${value}`);
     });
     return resultArr.join('&');
-};
+}
 
 export default jsonToForm;

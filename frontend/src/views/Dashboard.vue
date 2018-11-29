@@ -48,9 +48,9 @@
 <script>
 import NavBar from '../components/NavBar.vue';
 import validateAuth from '../util/auth';
-import formatTime from '../util/timeFormat';
+import { dateToString } from '../util/timeFormat';
 import popupMessage from '../util/message';
-import deleteObjFromArr from '../util/arrayHelper';
+import { deleteObjFromArr } from '../util/arrayHelper';
 import { newPlan, getAllPlan, deletePlan } from '../api/api';
 
 export default {
@@ -77,7 +77,7 @@ export default {
             this.newPlan.name = '';
         },
         dateFormatter(row) {
-            return formatTime(row.createdAt);
+            return dateToString(row.createdAt);
         },
         createPlan() {
             this.dialogVisible = false;

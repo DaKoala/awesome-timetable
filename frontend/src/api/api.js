@@ -88,6 +88,10 @@ function deleteEvent(app, eventName) {
     });
 }
 
+function updateEvent(app, eventToBeEdited) {
+    return postForm(app, `${BASE_URL}${apiPath.updateEvent}`, eventToBeEdited);
+}
+
 export {
     checkExist,
     register,
@@ -100,4 +104,5 @@ export {
     newEvent,
     deletePlan,
     deleteEvent,
+    updateEvent,
 };

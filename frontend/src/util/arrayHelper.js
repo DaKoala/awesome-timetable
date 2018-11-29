@@ -16,4 +16,23 @@ function deleteObjFromArr(arr, pairs) {
     }
 }
 
-export default deleteObjFromArr;
+function deleteObjFromArrayAndInsert(arr, pairs, newObj) {
+    for (let i = arr.length - 1; i >= 0; i -= 1) {
+        const curr = arr[i];
+        try {
+            Object.entries(pairs).forEach(([key, value]) => {
+                if (curr[key] !== value) {
+                    throw breakException;
+                }
+            });
+            arr.splice(i, 1, newObj);
+        } catch (e) {
+            if (e !== breakException) { throw e; }
+        }
+    }
+}
+
+export {
+    deleteObjFromArr,
+    deleteObjFromArrayAndInsert,
+};

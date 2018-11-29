@@ -39,17 +39,25 @@
             </div>
         </main>
 
-        <el-dialog title="New event" :visible.sync="eventFormVisible">
+        <el-dialog :title="isNewForm ? 'New event' : 'Edit event'" :visible.sync="eventFormVisible">
             <el-form :model="eventForm" label-width="80px">
                 <el-form-item label="Plan">
-                    <el-input v-model="eventForm.planName" disabled></el-input>
+                    <el-input v-model="eventForm.planName" disabled v-if="isNewForm"></el-input>
+                    <el-input v-model="eventToBeEdited.planName" disabled v-else></el-input>
                 </el-form-item>
                 <el-form-item label="Event">
-                    <el-input v-model="eventForm.name" prefix-icon="el-icon-edit-outline">
-                    </el-input>
+                    <el-input v-model="eventForm.name" prefix-icon="el-icon-edit-outline"
+                              v-if="isNewForm"></el-input>
+                    <el-input v-model="eventToBeEdited.newName" prefix-icon="el-icon-edit-outline"
+                              v-else></el-input>
                 </el-form-item>
                 <el-form-item label="Date">
-                    <el-checkbox-group v-model="eventForm.date" :min="1" :max="7">
+                    <el-checkbox-group v-model="eventForm.date" :min="1" :max="7" v-if="isNewForm">
+                        <el-checkbox v-for="date in dateOptions" :label="date" :key="date">
+                            {{date}}
+                        </el-checkbox>
+                    </el-checkbox-group>
+                    <el-checkbox-group v-model="eventToBeEdited.date" :min="1" :max="7" v-else>
                         <el-checkbox v-for="date in dateOptions" :label="date" :key="date">
                             {{date}}
                         </el-checkbox>
@@ -62,7 +70,14 @@
                 step: '00:05',
                 end: '21:00',
                 maxTime: eventForm.toTime,
-            }"></el-time-select>
+            }" v-if="isNewForm"></el-time-select>
+                    <el-time-select placeholder="Start" v-model="eventToBeEdited.fromTime"
+                                    :picker-options="{
+                start: '07:00',
+                step: '00:05',
+                end: '21:00',
+                maxTime: eventToBeEdited.toTime,
+            }" v-else></el-time-select>
                     <span> - </span>
                     <el-time-select placeholder="End" v-model="eventForm.toTime"
                                     :picker-options="{
@@ -70,11 +85,20 @@
                 step: '00:05',
                 end: '21:00',
                 minTime: eventForm.fromTime,
-            }"></el-time-select>
+            }" v-if="isNewForm"></el-time-select>
+                    <el-time-select placeholder="End" v-model="eventToBeEdited.toTime"
+                                    :picker-options="{
+                start: '07:00',
+                step: '00:05',
+                end: '21:00',
+                minTime: eventToBeEdited.fromTime,
+            }" v-else></el-time-select>
                 </el-form-item>
                 <el-form-item label="Location">
-                    <el-input v-model="eventForm.location" prefix-icon="el-icon-location">
-                    </el-input>
+                    <el-input v-model="eventForm.location" prefix-icon="el-icon-location"
+                              v-if="isNewForm"></el-input>
+                    <el-input v-model="eventToBeEdited.location" prefix-icon="el-icon-location"
+                              v-else></el-input>
                 </el-form-item>
             </el-form>
 
@@ -82,7 +106,7 @@
                 <el-button @click="toggleForm">Cancel</el-button>
                 <el-button type="primary" @click="submitForm"
                            v-loading.fullscreen.lock="screenLoading">
-                    Create
+                    {{isNewForm ? 'Create' : 'Edit'}}
                 </el-button>
             </div>
         </el-dialog>
@@ -92,9 +116,15 @@
 <script>
 import NavBar from '../components/NavBar.vue';
 import EventCard from '../components/EventCard.vue';
-import { getPlan, newEvent, deleteEvent } from '../api/api';
+import {
+    getPlan,
+    newEvent,
+    deleteEvent,
+    updateEvent,
+} from '../api/api';
 import popupMessage from '../util/message';
-import deleteFromObjArr from '../util/arrayHelper';
+import { arrayTimeToString } from '../util/timeFormat';
+import { deleteObjFromArr, deleteObjFromArrayAndInsert } from '../util/arrayHelper';
 
 export default {
     name: 'Schedule',
@@ -107,7 +137,9 @@ export default {
             screenLoading: false,
             events: [],
             eventLoading: false,
+            isNewForm: true,
             eventFormVisible: false,
+            eventToBeEdited: null,
             eventForm: {
                 planName: this.$route.params.scheduleName,
                 date: ['Mon'],
@@ -139,13 +171,23 @@ export default {
             try {
                 const res = await deleteEvent(this, event.name);
                 popupMessage(this, res, 'success');
-                deleteFromObjArr(this.events, { name: event.name });
+                deleteObjFromArr(this.events, { name: event.name });
             } catch (e) {
                 popupMessage(this, e.response);
             }
         },
-        handleEditCard(event) {
-            console.log(event.name);
+        async handleEditCard(event) {
+            this.toggleForm();
+            this.isNewForm = false;
+            this.eventToBeEdited = {
+                oldName: event.name,
+                newName: event.name,
+                fromTime: arrayTimeToString(event.fromTime),
+                toTime: arrayTimeToString(event.toTime),
+                date: event.date.concat(),
+                location: event.location,
+                planName: this.eventForm.planName,
+            };
         },
         formatTime(start, end) {
             const formatTimeHelper = time => (String(time).length > 1 ? String(time) : `0${time}`);
@@ -173,22 +215,40 @@ export default {
         },
         toggleForm() {
             this.eventFormVisible = !this.eventFormVisible;
-            this.eventForm.date = ['Mon'];
-            this.eventForm.name = '';
-            this.eventForm.fromTime = '';
-            this.eventForm.toTime = '';
-            this.eventForm.location = '';
+            if (this.isNewForm) {
+                this.eventForm.date = ['Mon'];
+                this.eventForm.name = '';
+                this.eventForm.fromTime = '';
+                this.eventForm.toTime = '';
+                this.eventForm.location = '';
+            } else {
+                this.eventToBeEdited = null;
+            }
+            this.isNewForm = true;
         },
         async submitForm() {
             try {
                 this.screenLoading = true;
-                const res = await newEvent(this, this.eventForm);
-                this.events.unshift(res.data);
+                if (this.isNewForm) {
+                    const res = await newEvent(this, this.eventForm);
+                    this.events.unshift(res.data);
+                    this.$message({
+                        message: 'Event created',
+                        type: 'success',
+                    });
+                } else {
+                    const res = await updateEvent(this, this.eventToBeEdited);
+                    deleteObjFromArrayAndInsert(this.events,
+                        {
+                            name: this.eventToBeEdited.oldName,
+                        },
+                        res.data);
+                    this.$message({
+                        message: 'Event updated',
+                        type: 'success',
+                    });
+                }
                 this.screenLoading = false;
-                this.$message({
-                    message: 'Event created',
-                    type: 'success',
-                });
                 this.toggleForm();
             } catch (e) {
                 popupMessage(this, e.response);
