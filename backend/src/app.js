@@ -26,6 +26,7 @@ const apiPath = {
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
+    deletePlan: '/plan/delete',
     newEvent: '/event/new',
 };
 
@@ -229,6 +230,22 @@ app.post(apiPath.newEvent, async (req, res) => {
         res.send(clean.cleanSavedEvent(savedEvent));
     } catch (e) {
         console.log(e);
+        error.serverError(res);
+    }
+});
+
+app.get(apiPath.deletePlan, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    try {
+        const { planName } = req.query;
+        const username = auth.getUsernameFromSession(req);
+        await Event.deleteMany({ plan: planName, creator: username });
+        await Plan.deleteOne({ name: planName, creator: username });
+        res.send({
+            message: 'Plan has been deleted',
+        });
+    } catch (e) {
         error.serverError(res);
     }
 });

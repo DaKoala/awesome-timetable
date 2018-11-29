@@ -21,7 +21,10 @@
                                        @click="goToSchedule(scope.row.name)">
                                 View
                             </el-button>
-                            <el-button size="mini" type="danger">Delete</el-button>
+                            <el-button size="mini" type="danger"
+                                       @click="deletePlan(scope.row.name)">
+                                Delete
+                            </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -46,7 +49,9 @@
 import NavBar from '../components/NavBar.vue';
 import validateAuth from '../util/auth';
 import formatTime from '../util/timeFormat';
-import { newPlan, getAllPlan } from '../api/api';
+import popupMessage from '../util/message';
+import deleteObjFromArr from '../util/arrayHelper';
+import { newPlan, getAllPlan, deletePlan } from '../api/api';
 
 export default {
     name: 'Dashboard',
@@ -87,6 +92,20 @@ export default {
             this.$router.push({
                 path: `/schedule/${name}`,
             });
+        },
+        async deletePlan(planName) {
+            try {
+                await this.$confirm('The plan will be deleted permanently, are you sure?', 'Warning', {
+                    confirmButtonText: 'Confirm',
+                    cancelButtonText: 'Cancel',
+                    type: 'warning',
+                });
+                const res = await deletePlan(this, planName);
+                deleteObjFromArr(this.plans, { name: planName });
+                popupMessage(this, res, 'success');
+            } catch (e) {
+                popupMessage(this, e.response);
+            }
         },
     },
     async created() {

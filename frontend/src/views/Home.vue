@@ -49,7 +49,7 @@
 // @ is an alias to /src
 import { checkExist, register, login } from '../api/api';
 import validateAuth from '../util/auth';
-import message from '../util/message';
+import popupMessage from '../util/message';
 
 export default {
     name: 'home',
@@ -186,7 +186,7 @@ export default {
                                 }
                             })
                             .catch((e) => {
-                                message(this, e.response);
+                                popupMessage(this, e.response);
                             });
                     }
                 });
@@ -202,7 +202,7 @@ export default {
                         }
                     })
                     .catch((e) => {
-                        message(this, e.response);
+                        popupMessage(this, e.response);
                     });
             }
         },

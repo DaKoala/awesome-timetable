@@ -71,6 +71,12 @@ const newEvent = function(app, event) {
     return postForm(app, `${BASE_URL}${apiPath.newEvent}`, event);
 };
 
+const deletePlan = function(app, planName) {
+    return fetchGet(app, `${BASE_URL}${apiPath.deletePlan}`, {
+        planName
+    });
+};
+
 export {
     checkExist,
     register,
@@ -80,4 +86,5 @@ export {
     getAllPlan,
     getPlan,
     newEvent,
+    deletePlan,
 };
