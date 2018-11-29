@@ -22,6 +22,7 @@ const apiPath = {
     checkExist: '/user/checkExist',
     register: '/user/register',
     login: '/user/login',
+    logout: '/user/logout',
     auth: '/user/auth',
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',
@@ -86,6 +87,20 @@ app.post(apiPath.login, async (req, res) => {
         console.log(e);
         error.serverError(res);
     }
+});
+
+app.get(apiPath.logout, (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    req.session.regenerate((err) => {
+        if (!err) {
+            res.send({
+                message: 'success',
+            });
+        } else {
+            error.serverError(res);
+        }
+    });
 });
 
 app.post(apiPath.register, async (req, res) => {

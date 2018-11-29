@@ -4,6 +4,7 @@ const apiPath = {
     checkExist: '/user/checkExist',
     register: '/user/register',
     login: '/user/login',
+    logout: '/user/logout',
     auth: '/user/auth',
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',

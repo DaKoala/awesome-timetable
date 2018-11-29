@@ -8,6 +8,9 @@ export default new Vuex.Store({
         user: null,
     },
     mutations: {
+        removeUser(state) {
+            state.user = null;
+        },
         updateUser(state, user) {
             state.user = {
                 email: user.email,

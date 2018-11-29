@@ -4,7 +4,7 @@ import { BASE_URL, apiPath } from './config';
 
 axios.defaults.withCredentials = true;
 
-const postForm = function(app, url, data) {
+function postForm(app, url, data) {
     const authObj = {};
     if (app.$store.state.user) {
         authObj.author = app.$store.state.user.name;
@@ -17,9 +17,9 @@ const postForm = function(app, url, data) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
     });
-};
+}
 
-const fetchGet = function(app, url, data) {
+function fetchGet(app, url, data) {
     const authObj = {};
     if (app.$store.state.user) {
         authObj.author = app.$store.state.user.name;
@@ -27,9 +27,9 @@ const fetchGet = function(app, url, data) {
     return axios.get(url, {
         params: Object.assign(data || {}, authObj),
     });
-};
+}
 
-const checkExist = function(app, type, value) {
+function checkExist(app, type, value) {
     const data = {};
     if (type === 'email') {
         data.email = value;
@@ -37,51 +37,56 @@ const checkExist = function(app, type, value) {
         data.name = value;
     }
     return fetchGet(app, `${BASE_URL}${apiPath.checkExist}`, data);
-};
+}
 
-const register = function(app, userData) {
+function register(app, userData) {
     return postForm(app, `${BASE_URL}${apiPath.register}`, userData);
-};
+}
 
-const login = function(app, userData) {
+function login(app, userData) {
     return postForm(app, `${BASE_URL}${apiPath.login}`, userData);
-};
+}
 
-const auth = function() {
+function logout(app) {
+    return fetchGet(app, `${BASE_URL}${apiPath.logout}`);
+}
+
+function auth() {
     return axios.get(`${BASE_URL}${apiPath.auth}`);
-};
+}
 
-const newPlan = function(app, planName) {
+function newPlan(app, planName) {
     return postForm(app, `${BASE_URL}${apiPath.newPlan}`, {
         name: planName,
     });
-};
+}
 
-const getAllPlan = function(app) {
+function getAllPlan(app) {
     return fetchGet(app, `${BASE_URL}${apiPath.getAllPlan}`);
-};
+}
 
-const getPlan = function(app, planName) {
+function getPlan(app, planName) {
     return fetchGet(app, `${BASE_URL}${apiPath.getPlan}`, {
         planName,
     });
-};
+}
 
-const newEvent = function(app, event) {
+function newEvent(app, event) {
     return postForm(app, `${BASE_URL}${apiPath.newEvent}`, event);
-};
+}
 
-const deletePlan = function(app, planName) {
+function deletePlan(app, planName) {
     return fetchGet(app, `${BASE_URL}${apiPath.deletePlan}`, {
-        planName
+        planName,
     });
-};
+}
 
 export {
     checkExist,
     register,
     auth,
     login,
+    logout,
     newPlan,
     getAllPlan,
     getPlan,

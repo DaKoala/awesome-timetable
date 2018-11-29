@@ -8,7 +8,7 @@
                     {{this.$store.state.user.name}}<i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>Sign out</el-dropdown-item>
+                    <el-dropdown-item @click.native="signOut">Sign out</el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
         </div>
@@ -16,6 +16,9 @@
 </template>
 
 <script>
+import popupMessage from '../util/message';
+import { logout } from '../api/api';
+
 export default {
     name: 'NavBar',
     data() {
@@ -38,6 +41,16 @@ export default {
     methods: {
         navPlan() {
             this.$router.push('/dashboard');
+        },
+        async signOut() {
+            try {
+                await logout(this);
+                this.$store.commit('removeUser');
+                this.$router.replace('/');
+            } catch (e) {
+                console.log(e);
+                popupMessage(this, e.response);
+            }
         },
     },
 };
