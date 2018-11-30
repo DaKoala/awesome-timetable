@@ -28,6 +28,7 @@ const apiPath = {
     newPlan: '/plan/new',
     getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
+    editPlanName: '/plan/editName',
     deletePlan: '/plan/delete',
     newEvent: '/event/new',
     deleteEvent: '/event/delete',
@@ -213,6 +214,23 @@ app.get(apiPath.getPlan, async (req, res) => {
         });
     } catch (e) {
         console.log(e);
+        error.serverError(res);
+    }
+});
+
+app.post(apiPath.editPlanName, async (req, res) => {
+    if (!auth.accessAuth(req, res)) { return; }
+
+    const { oldName, newName } = req.body;
+    const creator = auth.getUsernameFromSession(req);
+    try {
+        await Plan.update({ creator, name: oldName }, {
+            $set: { name: newName },
+        });
+        res.send({
+            message: 'Plan name edited successfully',
+        });
+    } catch (e) {
         error.serverError(res);
     }
 });

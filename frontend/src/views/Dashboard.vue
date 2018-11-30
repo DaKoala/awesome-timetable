@@ -15,11 +15,15 @@
                     </el-table-column>
                     <el-table-column prop="eventsCount" width="100" label="Events">
                     </el-table-column>
-                    <el-table-column label="Operation" width="200">
+                    <el-table-column label="Operation" width="250">
                         <template slot-scope="scope">
                             <el-button size="mini" type="success"
                                        @click="goToSchedule(scope.row.name)">
                                 View
+                            </el-button>
+                            <el-button size="mini" type="primary"
+                                       @click="editPlanName(scope.$index, scope.row.name)">
+                                Edit
                             </el-button>
                             <el-button size="mini" type="danger"
                                        @click="deletePlan(scope.row.name)">
@@ -68,9 +72,6 @@ export default {
             plans: [],
         };
     },
-    computed: {
-
-    },
     methods: {
         toggleDialog() {
             this.dialogVisible = !this.dialogVisible;
@@ -92,6 +93,9 @@ export default {
             this.$router.push({
                 path: `/schedule/${name}`,
             });
+        },
+        async editPlanName(planIndex, planName) {
+            this.$prompt();
         },
         async deletePlan(planName) {
             try {
