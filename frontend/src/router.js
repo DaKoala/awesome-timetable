@@ -6,12 +6,15 @@ import Schedule from './views/Schedule.vue';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
     routes: [
         {
             path: '/',
             name: 'home',
             component: Home,
+            meta: {
+                title: 'Awesome Timetable',
+            },
         },
         {
             path: '/dashboard',
@@ -21,11 +24,26 @@ export default new Router({
             // which is lazy-loaded when the route is visited.
             // component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
             component: Dashboard,
+            meta: {
+                title: 'Dashboard',
+            },
         },
         {
             path: '/schedule/:scheduleName',
             name: 'schedule',
             component: Schedule,
+            meta: {
+                title: 'My Plan',
+            },
         },
     ],
 });
+
+router.beforeEach((to, from, next) => {
+    if (to.meta.title) {
+        document.title = to.meta.title;
+    }
+    next();
+});
+
+export default router;
