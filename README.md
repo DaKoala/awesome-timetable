@@ -19,37 +19,32 @@ The application will store users, courses and schedules
 User Model
 ```javascript
 /**
- * @property {String} username - username
- * @property {Number} pwdHash - the hash code of the password
- * @property {Array} schedules - an array of schedules the user have
+ * @property {String} email - email address
+ * @property {String} pwdHash - the hash code of the password
+ * @property {String} name - the name displaying on the webpage
  */
 ```
 
-Schedule Model
+Plan Model
 ```javascript
 /**
- * @property {Object} owner - a reference to a user object
- * @property {String} name - name of the schedule
- * @property {Array} courses - an array of courses in the schedule
+ * @property {String} creator - name of the creator
+ * @property {String} name - name of the plan
  * @property {Date} createAt - the create time
- * @property {String} identifier - a unique string to identify the schedule, used for sharing
+ * @property {Array} events - an array containing Object IDs of the events
  */
 ```
 
-Course Model
+Event Model
 ```javascript
 /**
- * @property {String} name - name of the course(e.g. Applied Internet Tech)
- * @property {String} code - code of the course(e.g. CSCI-UA 480)
- * @property {Array} start - an array of length 2 represents the start time of
- * the class. It contains two numbers where the first represents the hour and
- * the second represents minute
- * @property {Array} end - an array of length 2 represents the end time of
- * the class
- * @property {String} instructor - name of the instructor who teaches the course
- * @property {String} location - the location where the course is taught
- * @property {String} room - room number of the classroom
- * @property {String} desc - more information about the course
+ * @property {String} creator - name of the creator
+ * @property {String} plan - name of the plan
+ * @property {String} name - name of the event
+ * @property {String} location - location where the event takes place
+ * @property {Array} date - an array containing at most 7 elements representing days in a week
+ * @property {Array} fromTime - an array of length two represents the starting time
+ * @property {Array} endTime - an array of length two represents the ending time
  */
 ```
 

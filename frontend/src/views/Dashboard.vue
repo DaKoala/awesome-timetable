@@ -82,14 +82,18 @@ export default {
         dateFormatter(row) {
             return dateToString(row.createdAt);
         },
-        createPlan() {
-            this.dialogVisible = false;
-            newPlan(this, this.newPlan.name)
-                .then((res) => {
-                    if (res.status === 200) {
-                        this.plans.unshift(res.data.plan);
-                    }
+        async createPlan() {
+            try {
+                const res = await newPlan(this, this.newPlan.name);
+                this.plans.unshift(res.data.plan);
+                this.dialogVisible = false;
+                this.$message({
+                    message: 'New plan created',
+                    type: 'success',
                 });
+            } catch (e) {
+                popupMessage(this, e.response);
+            }
         },
         goToSchedule(name) {
             this.$router.push({

@@ -202,7 +202,14 @@ export default {
                         }
                     })
                     .catch((e) => {
-                        popupMessage(this, e.response);
+                        if (e.response) {
+                            popupMessage(this, e.response);
+                        } else {
+                            this.$message({
+                                message: 'Server error',
+                                type: 'error',
+                            });
+                        }
                     });
             }
         },
