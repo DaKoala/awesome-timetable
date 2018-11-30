@@ -12,7 +12,6 @@ module.exports = {
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-alert': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         indent: ['error', 4],
-        'no-trailing-spaces': 'off',
         'no-param-reassign': 'off',
         'space-before-function-paren': 'off',
     },

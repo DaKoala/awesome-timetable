@@ -81,6 +81,13 @@ function deletePlan(app, planName) {
     });
 }
 
+function editPlanName(app, oldPlanName, newPlanName) {
+    return postForm(app, `${BASE_URL}${apiPath.editPlanName}`, {
+        oldName: oldPlanName,
+        newName: newPlanName,
+    });
+}
+
 function deleteEvent(app, eventName) {
     return fetchGet(app, `${BASE_URL}${apiPath.deleteEvent}`, {
         eventName,
@@ -103,6 +110,7 @@ export {
     getPlan,
     newEvent,
     deletePlan,
+    editPlanName,
     deleteEvent,
     updateEvent,
 };

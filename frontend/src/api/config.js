@@ -10,6 +10,7 @@ const apiPath = {
     getAllPlan: '/plan/getAll',
     getPlan: '/plan/get',
     deletePlan: '/plan/delete',
+    editPlanName: '/plan/editName',
     newEvent: '/event/new',
     deleteEvent: '/event/delete',
     updateEvent: '/event/update',

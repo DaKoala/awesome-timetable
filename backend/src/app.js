@@ -224,6 +224,9 @@ app.post(apiPath.editPlanName, async (req, res) => {
     const { oldName, newName } = req.body;
     const creator = auth.getUsernameFromSession(req);
     try {
+        await Event.updateMany({ creator, plan: oldName }, {
+            $set: { plan: newName },
+        });
         await Plan.update({ creator, name: oldName }, {
             $set: { name: newName },
         });

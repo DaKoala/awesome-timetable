@@ -22,7 +22,7 @@
                                 View
                             </el-button>
                             <el-button size="mini" type="primary"
-                                       @click="editPlanName(scope.$index, scope.row.name)">
+                                       @click="renamePlan(scope.$index, scope.row.name)">
                                 Edit
                             </el-button>
                             <el-button size="mini" type="danger"
@@ -55,7 +55,9 @@ import validateAuth from '../util/auth';
 import { dateToString } from '../util/timeFormat';
 import popupMessage from '../util/message';
 import { deleteObjFromArr } from '../util/arrayHelper';
-import { newPlan, getAllPlan, deletePlan } from '../api/api';
+import {
+    newPlan, getAllPlan, deletePlan, editPlanName,
+} from '../api/api';
 
 export default {
     name: 'Dashboard',
@@ -94,8 +96,19 @@ export default {
                 path: `/schedule/${name}`,
             });
         },
-        async editPlanName(planIndex, planName) {
-            this.$prompt();
+        async renamePlan(planIndex, planName) {
+            const { value: inputPlanName } = await this.$prompt('Please enter the new name of the plan', 'Rename plan', {
+                confirmButtonText: 'Confirm',
+                cancelButtonText: 'Cancel',
+                inputPlaceholder: `original name is: ${planName}`,
+            });
+            try {
+                const res = await editPlanName(this, planName, inputPlanName);
+                this.plans[planIndex].name = inputPlanName;
+                popupMessage(this, res, 'success');
+            } catch (e) {
+                popupMessage(this, e.response);
+            }
         },
         async deletePlan(planName) {
             try {
