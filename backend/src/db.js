@@ -24,7 +24,6 @@ const UserSchema = new Schema({
         minLength: 4,
         maxLength: 16,
     },
-    schedules: [ObjectId],
 });
 
 const PlanSchema = new Schema({

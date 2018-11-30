@@ -14,6 +14,8 @@ The application will store users, courses and schedules
 
 - A schedule can have multiple courses
 
+[Click here](https://github.com/nyu-csci-ua-0480-001-003-fall-2018/DaKoala-final-project/blob/master/backend/src/db.js) to view the `db.js` file
+
 User Model
 ```javascript
 /**
